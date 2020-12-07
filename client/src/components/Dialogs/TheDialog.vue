@@ -1,23 +1,26 @@
 <template>
   <section>
-    <v-btn
-      :id="`activator_${activatorText}`"
-      class="px-0"
-      :small="simple"
-      fab
-      aria-label="Open modal"
-      :text="simple"
-      :color="color"
-      @click.prevent="dialog = true"
-    >
-      <v-icon dark>mdi-{{ activatorIcon }}</v-icon>
-    </v-btn>
-    <label
-      :for="`activator_${activatorText}`"
-      class="label_text"
-    >{{
+    <div @click.prevent="dialog = true">
+      <slot name="activator">
+        <v-btn
+          :id="`activator_${activatorText}`"
+          class="px-0 mr-2"
+          :small="simple"
+          fab
+          aria-label="Open modal"
+          :text="simple"
+          :color="color"
+        >
+          <v-icon dark>mdi-{{ activatorIcon }}</v-icon>
+        </v-btn>
+        <label
+          :for="`activator_${activatorText}`"
+          class="label_text"
+        >{{
       activatorText
     }}</label>
+      </slot>
+    </div>
     <v-dialog
       v-model="dialog"
       max-width="600"
@@ -46,23 +49,22 @@
               <slot />
             </v-container>
           </v-card-text>
-          <v-card-actions
-            v-if="footer"
-            class="footer"
-          >
+          <v-card-actions class="footer">
             <v-spacer />
-            <v-btn
-              color="secondary darken-1"
-              class="mr-2"
-              outlined
-              @click="close"
-            >Cancel</v-btn>
-            <v-btn
-              color="secondary darken-1"
-              outlined
-              type="submit"
-              :disabled="!valid"
-            >Submit</v-btn>
+            <slot name="footer">
+              <v-btn
+                color="secondary darken-1"
+                class="mr-2"
+                outlined
+                @click="close"
+              >Cancel</v-btn>
+              <v-btn
+                color="secondary darken-1"
+                outlined
+                type="submit"
+                :disabled="!valid"
+              >Submit</v-btn>
+            </slot>
           </v-card-actions>
         </v-form>
       </v-card>
@@ -77,7 +79,7 @@ export default {
   props: {
     activatorIcon: {
       type: String,
-      required: true,
+      default: "",
     },
     header: {
       type: String,
@@ -89,7 +91,7 @@ export default {
     },
     submitLogic: {
       type: Function,
-      default: () => {},
+      default: () => { },
     },
     activatorText: {
       type: String,
@@ -97,14 +99,6 @@ export default {
     },
     simple: {
       type: Boolean,
-    },
-    footer: {
-      type: Boolean,
-      default: true,
-    },
-    closeOnSubmit: {
-      type: Boolean,
-      default: true,
     },
   },
   data () {
@@ -116,9 +110,7 @@ export default {
   methods: {
     onSubmit () {
       this.submitLogic();
-      if (this.closeOnSubmit) {
-        this.close();
-      }
+      this.close();
     },
     close () {
       this.dialog = false;
